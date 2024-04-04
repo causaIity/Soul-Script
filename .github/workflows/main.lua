@@ -2587,6 +2587,59 @@ RunService:UnbindFromRenderStep(UpdateName);
 RunService:BindToRenderStep(GetDataName, 300, UpdatePlayerData);
 RunService:BindToRenderStep(UpdateName, 199, Update);
 
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local Player = Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:FindFirstChild("Humanoid")
+
+local Toggle = false
+local OriginalSpeed = Humanoid.WalkSpeed
+local OriginalJumpPower = Humanoid.JumpPower
+local Speed = 100
+local JumpPower = 200
+
+
+local function Jump()
+if not Humanoid then return end
+if not Toggle then return end
+	Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+end
+
+local function changeWS()
+	if not Humanoid then return end
+	if Toggle and Humanoid then
+		Humanoid.WalkSpeed = Speed
+		Humanoid.JumpPower = JumpPower
+	elseif not Toggle and Humanoid then
+		Humanoid.WalkSpeed = OriginalSpeed
+		Humanoid.JumpPower = OriginalJumpPower
+	end
+	Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+		if Toggle and Humanoid then
+			Humanoid.WalkSpeed = Speed
+		end
+	end)
+	Humanoid:GetPropertyChangedSignal("JumpPower"):Connect(function()
+		if Toggle and Humanoid then
+			Humanoid.WalkSpeed = Speed
+			Humanoid.JumpPower = JumpPower
+		end
+	end)
+end
+
+UserInputService.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
+	if input.KeyCode == Enum.KeyCode.K then
+		Toggle = not Toggle
+		changeWS()
+	elseif input.KeyCode == Enum.KeyCode.Space then
+        print("jump")
+		Jump()
+	end
+end)
+
 local camera = workspace.CurrentCamera
 local entitiesFolder = game:GetService("Workspace").Entities
 local runService = game:GetService("RunService")
@@ -2693,56 +2746,3 @@ for _, entity in ipairs(entitiesFolder:GetChildren()) do
 end
 
 entitiesFolder.ChildAdded:Connect(entityAdded)
-
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-
-local Player = Players.LocalPlayer
-local Character = Player.Character or Player.CharacterAdded:Wait()
-local Humanoid = Character:FindFirstChild("Humanoid")
-
-local Toggle = false
-local OriginalSpeed = Humanoid.WalkSpeed
-local OriginalJumpPower = Humanoid.JumpPower
-local Speed = 100
-local JumpPower = 200
-
-
-local function Jump()
-if not Humanoid then return end
-if not Toggle then return end
-	Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-end
-
-local function changeWS()
-	if not Humanoid then return end
-	if Toggle and Humanoid then
-		Humanoid.WalkSpeed = Speed
-		Humanoid.JumpPower = JumpPower
-	elseif not Toggle and Humanoid then
-		Humanoid.WalkSpeed = OriginalSpeed
-		Humanoid.JumpPower = OriginalJumpPower
-	end
-	Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-		if Toggle and Humanoid then
-			Humanoid.WalkSpeed = Speed
-		end
-	end)
-	Humanoid:GetPropertyChangedSignal("JumpPower"):Connect(function()
-		if Toggle and Humanoid then
-			Humanoid.WalkSpeed = Speed
-			Humanoid.JumpPower = JumpPower
-		end
-	end)
-end
-
-UserInputService.InputBegan:Connect(function(input, gpe)
-	if gpe then return end
-	if input.KeyCode == Enum.KeyCode.K then
-		Toggle = not Toggle
-		changeWS()
-	elseif input.KeyCode == Enum.KeyCode.Space then
-        print("jump")
-		Jump()
-	end
-end)
