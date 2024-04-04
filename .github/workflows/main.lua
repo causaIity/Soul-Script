@@ -2633,7 +2633,6 @@ UserInputService.InputBegan:Connect(function(input, gpe)
 		Toggle = not Toggle
 		changeWS()
 	elseif input.KeyCode == Enum.KeyCode.Space then
-        print("jump")
 		Jump()
 	end
 end)
